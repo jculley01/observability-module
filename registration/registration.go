@@ -12,7 +12,7 @@ type Registration struct {
 	Type string `json:"type"`
 }
 
-//responsible for registering the service
+// responsible for registering the service
 func RegisterService(webSocketURL, serviceID, serviceType string) error {
 	registrationData := Registration{
 		Name: serviceID,
