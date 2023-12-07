@@ -12,7 +12,6 @@ type Registration struct {
 	Type string `json:"type"`
 }
 
-// RegisterService handles the registration of the service.
 func RegisterService(webSocketURL, serviceID, serviceType string) error {
 	registrationData := Registration{
 		Name: serviceID,
