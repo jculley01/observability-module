@@ -124,7 +124,7 @@ func ginMetricsMiddleware() gin.HandlerFunc {
 		}
 
 		// Send metrics
-		if err := sendMetrics(metrics, wsSocketURL); err != nil {
+		if err := sendMetrics(metrics); err != nil {
 			log.Printf("Error sending metrics: %v\n", err)
 		}
 	}
@@ -173,7 +173,7 @@ func echoMetricsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		// Send metrics
-		if err := sendMetrics(metrics, wsSocketURL); err != nil {
+		if err := sendMetrics(metrics); err != nil {
 			log.Printf("Error sending metrics: %v\n", err)
 		}
 
@@ -226,7 +226,7 @@ func gorillaMuxMetricsMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Send metrics
-		if err := sendMetrics(metrics, wsSocketURL); err != nil {
+		if err := sendMetrics(metrics); err != nil {
 			log.Printf("Error sending metrics: %v\n", err)
 		}
 
@@ -278,7 +278,7 @@ func netHttpMetricsMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Send metrics
-		if err := sendMetrics(metrics, wsSocketURL); err != nil {
+		if err := sendMetrics(metrics); err != nil {
 			log.Printf("Error sending metrics: %v\n", err)
 		}
 	})
@@ -326,7 +326,7 @@ func fiberMetricsMiddleware(c *fiber.Ctx) error {
 	}
 
 	// Send metrics
-	if err := sendMetrics(metrics, wsSocketURL); err != nil {
+	if err := sendMetrics(metrics); err != nil {
 		log.Printf("Error sending metrics: %v\n", err)
 	}
 
