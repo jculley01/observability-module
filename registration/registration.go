@@ -33,7 +33,7 @@ func RegisterService(webSocketURL, serviceID, serviceType string) error {
 }
 
 func registerWithRegistry(registryURL string, jsonData []byte) error {
-	ticker := time.NewTicker(30 * time.Second) // Retry every 30 seconds
+	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	for {
@@ -55,11 +55,14 @@ func registerWithRegistry(registryURL string, jsonData []byte) error {
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				fmt.Println("Error reading response, retrying...:", err)
+				c.Close()
+				continue
 			} else {
 				fmt.Printf("Response from server: %s\n", message)
 			}
+			// Consider keeping the connection open if needed for ongoing communication
+			// For now, we close it but don't exit the function
 			c.Close()
-			return nil
 		}
 	}
 }
