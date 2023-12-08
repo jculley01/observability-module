@@ -20,6 +20,12 @@ var (
 )
 
 var (
+	// ... (existing variable declarations)
+	wsConn    *websocket.Conn
+	connMutex sync.Mutex
+)
+
+var (
 	influxDBURL string
 	token       string
 	org         string
@@ -386,27 +392,47 @@ func (rw *responseWriter) Size() int {
 	return rw.size
 }
 
-func sendMetrics(metrics Metrics, centralRegisterWSURL string) error {
-	// Serialize the Metrics struct into JSON
+func sendMetrics(metrics Metrics) error {
+	if err := ensureWebSocketConnection(wsSocketURL); err != nil {
+		return err
+	}
+
 	jsonData, err := json.Marshal(metrics)
 	if err != nil {
 		return err
 	}
 
-	// Connect to the WebSocket server
-	c, _, err := websocket.DefaultDialer.Dial(centralRegisterWSURL, nil)
-	if err != nil {
-		log.Println("dial:", err)
-		return err
+	if err := wsConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
+		return fmt.Errorf("failed to write message: %v", err)
 	}
-	defer c.Close()
 
-	// Send the JSON data to the WebSocket server
-	err = c.WriteMessage(websocket.TextMessage, jsonData)
-	if err != nil {
-		log.Println("write:", err)
-		return err
+	return nil
+}
+
+func ensureWebSocketConnection(centralRegisterWSURL string) error {
+	connMutex.Lock()
+	defer connMutex.Unlock()
+
+	if wsConn != nil {
+		return nil // Connection is already established
 	}
+
+	var err error
+	wsConn, _, err = websocket.DefaultDialer.Dial(centralRegisterWSURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to dial WebSocket: %v", err)
+	}
+
+	// Start a goroutine to keep the connection alive
+	go func() {
+		for {
+			if _, _, err := wsConn.NextReader(); err != nil {
+				wsConn.Close()
+				wsConn = nil
+				return
+			}
+		}
+	}()
 
 	return nil
 }
