@@ -97,7 +97,7 @@ func MetricsInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 
 	//fmt.Printf("metrics %v", metrics)
 
-	metricsErr := sendMetrics(metrics, "ws://localhost:8090/metrics")
+	metricsErr := sendMetrics(metrics, "wss://centralreg-necuf5ddgq-ue.a.run.app/metrics")
 	if metricsErr != nil {
 		fmt.Printf("%v", metricsErr)
 		return nil, metricsErr
